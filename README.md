@@ -3,8 +3,8 @@
 Simple bookmark manager built for the Abstrabit micro-challenge.
 
 ## Live Submission
-- Live URL: `add-your-vercel-url-here`
-- GitHub Repo: `add-your-public-repo-url-here`
+- Live URL: `https://smart-bookmark-app-pink-eta.vercel.app`
+- GitHub Repo: `https://github.com/JustChaos10/smart-bookmark-app`
 
 ## Tech Stack
 - Next.js (App Router)
@@ -24,9 +24,10 @@ Simple bookmark manager built for the Abstrabit micro-challenge.
    ```bash
    npm install
    ```
-2. Create `.env.local` from `.env.example` and fill your values:
+2. Create `.env.local` in the project root:
    ```bash
-   cp .env.example .env.local
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 3. Run dev server:
    ```bash
@@ -44,23 +45,26 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 1. Create a new Supabase project.
 2. In Supabase SQL Editor, run `supabase/schema.sql`.
 3. In Auth -> Providers, enable Google.
-4. Add redirect URLs:
+4. In Auth -> URL Configuration, set:
+   - Site URL: `https://smart-bookmark-app-pink-eta.vercel.app`
+5. Add redirect URLs:
    - `http://localhost:3000/auth/callback`
-   - `https://your-vercel-domain.vercel.app/auth/callback`
-5. Ensure Realtime is enabled for table `public.bookmarks`.
+   - `https://smart-bookmark-app-pink-eta.vercel.app/auth/callback`
+6. Ensure Realtime is enabled for table `public.bookmarks`.
 
 ## Database and Policies (SQL)
 Schema and RLS policies are in:
 - `supabase/schema.sql`
 
 ## Deploy to Vercel
-1. Push code to public GitHub repo.
-2. Import repo in Vercel.
+1. Push code to a public GitHub repo.
+2. Import repo in Vercel (Framework: Next.js).
 3. Set environment variables in Vercel:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Redeploy after setting env vars.
 5. Add the Vercel callback URL to Supabase Google OAuth settings.
+6. Publish Google OAuth app in Google Cloud Audience so external accounts can log in.
 
 ## Manual Validation Checklist
 1. Login with Google works.
@@ -74,6 +78,8 @@ Schema and RLS policies are in:
 1. `create-next-app` failed in folder `Project` because npm package names cannot include uppercase letters.
    - Solution: scaffolded in lowercase folder name and moved project files to root.
 2. Session persistence across server/client needed correct Next.js + Supabase cookie handling.
-   - Solution: added Supabase SSR middleware and server client helpers from recommended pattern.
+   - Solution: added Supabase SSR middleware/proxy and server client helpers from recommended pattern.
 3. Real-time updates should stay user-private.
    - Solution: used strict RLS policies and realtime filter `user_id=eq.<current_user_id>`.
+4. Intermittent network/DNS timeouts to Supabase caused delayed add/delete feedback during development.
+   - Solution: improved client UX with immediate local state updates after successful add/delete and friendly retry messaging for transient network errors.
